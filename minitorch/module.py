@@ -1,3 +1,6 @@
+from re import L
+
+
 class Module:
     """
     Modules form a tree that store parameters and other
@@ -22,12 +25,16 @@ class Module:
     def train(self):
         "Set the mode of this module and all descendent modules to `train`."
         # TODO: Implement for Task 0.4.
-        raise NotImplementedError('Need to implement for Task 0.4')
+        self.training = True
+        for module in self.modules():
+            module.training = True
 
     def eval(self):
         "Set the mode of this module and all descendent modules to `eval`."
         # TODO: Implement for Task 0.4.
-        raise NotImplementedError('Need to implement for Task 0.4')
+        self.training = False
+        for module in self.modules():
+            module.training = False
 
     def named_parameters(self):
         """
@@ -35,15 +42,33 @@ class Module:
 
 
         Returns:
-            list of pairs: Contains the name and :class:`Parameter` of each ancestor parameter.
+            list of tuples: Contains the name and :class:`Parameter` of each ancestor parameter.
         """
         # TODO: Implement for Task 0.4.
-        raise NotImplementedError('Need to implement for Task 0.4')
+        # Base Case
+        named_params = list(self._parameters.items())
+        # Work toward Base Case
+        for module_name, module in self._modules.items():
+            # Recursive Call
+            named_params_submodule = [(f"{module_name}.{param_name}", param) for param_name, param in module.named_parameters()]
+            named_params += named_params_submodule
+        return named_params
 
     def parameters(self):
-        "Enumerate over all the parameters of this module and its descendents."
+        """
+        Enumerate over all the parameters of this module and its descendents.
+
+        Returns:
+            list of floats: parameter values
+        """
         # TODO: Implement for Task 0.4.
-        raise NotImplementedError('Need to implement for Task 0.4')
+        # Base Case
+        parameter_list = list(self._parameters.values())
+        # Work toward Base Case
+        for module in self.modules():
+            # Recursive Call
+            parameter_list += module.parameters()
+        return parameter_list
 
     def add_parameter(self, k, v):
         """
